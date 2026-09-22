@@ -30,7 +30,10 @@ CONFIGS: dict[str, list[str]] = {
     # refreshed only 100 times in the whole run.
     "q1_tnf1": ["dqn.target_network_frequency=1"],
     "q1_tnf5000": ["dqn.target_network_frequency=5000"],
-    # Q2 — replay buffer: ~2 episodes of recent history vs. never evicting.
+    # Q2 — replay buffer: a window smaller than one batch (so a minibatch *is*
+    # the buffer: one consecutive slice of trajectory), a couple of episodes,
+    # and a buffer that never evicts anything in 500k steps.
+    "q2_buf128": ["dqn.buffer_size=128"],
     "q2_buf500": ["dqn.buffer_size=500"],
     "q2_buf500000": ["dqn.buffer_size=500000"],
     # Q3 — exploration schedule: epsilon floored almost immediately vs. still

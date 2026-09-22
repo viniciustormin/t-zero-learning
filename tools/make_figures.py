@@ -29,8 +29,12 @@ SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK_2 = "#52514e"
 GRID = "#e5e4e0"
-# Ordinal blue ramp, validated light-mode (steps 250 / 450 / 700).
-RAMP = ["#86b6ef", "#2a78d6", "#0d366b"]
+# Ordinal blue ramps, validated light-mode with scripts/validate_palette.js
+# --ordinal: monotone lightness, light end clears 2:1 on the surface.
+RAMPS = {
+    3: ["#86b6ef", "#2a78d6", "#0d366b"],          # steps 250 / 450 / 700
+    4: ["#86b6ef", "#3987e5", "#1c5cab", "#0d366b"],  # steps 250 / 400 / 550 / 700
+}
 
 RETURN = "charts/episodic_return_mean_last100"
 TD_LOSS = "losses/td_loss"
@@ -53,7 +57,8 @@ QUESTIONS = {
     },
     "q2": {
         "series": [
-            ("q2_buf500", "buffer_size = 500"),
+            ("q2_buf128", "buffer_size = 128"),
+            ("q2_buf500", "500"),
             ("base", "10 000 (baseline)"),
             ("q2_buf500000", "500 000"),
         ],
@@ -122,7 +127,10 @@ def resample(rows_per_seed, metric, grid):
         x, y = series(rows, metric)
         if x.size < 2:
             continue
-        curves.append(ema(np.interp(grid, x, y, left=np.nan, right=y[-1]), SMOOTH[metric]))
+        # Smooth the raw series first: seeding the EMA from an interpolated
+        # NaN (the grid starts before learning_starts) would poison the curve.
+        ys = ema(y, SMOOTH[metric])
+        curves.append(np.interp(grid, x, ys, left=np.nan, right=ys[-1]))
     return curves
 
 
@@ -153,13 +161,26 @@ def build(qid, runs, total_steps):
     handles, labels = [], []
     for ax, (metric, title, yscale) in zip(axes, panels):
         style_axes(ax, title, yscale)
-        for (tag, label), color in zip(spec["series"], RAMP):
+        ramp = RAMPS[len(spec["series"])]
+        for (tag, label), color in zip(spec["series"], ramp):
             curves = resample(runs.get(tag, []), metric, grid)
             if not curves:
                 continue
-            for c in curves:  # individual seeds, recessive
-                ax.plot(grid, c, color=color, linewidth=0.7, alpha=0.30, zorder=2)
-            mean = np.nanmean(np.vstack(curves), axis=0)
+            stack = np.vstack(curves)
+            if stack.shape[0] > 1:
+                # Envelope over seeds, in the series colour. Drawing each seed as
+                # a thin translucent line instead makes the darkest series read as
+                # grey and become unattributable to its legend entry.
+                ax.fill_between(
+                    grid,
+                    np.nanmin(stack, axis=0),
+                    np.nanmax(stack, axis=0),
+                    color=color,
+                    alpha=0.18,
+                    linewidth=0,
+                    zorder=2,
+                )
+            mean = np.nanmean(stack, axis=0)
             (line,) = ax.plot(grid, mean, color=color, linewidth=1.8, zorder=3, label=label)
             if ax is axes[0]:
                 handles.append(line)
