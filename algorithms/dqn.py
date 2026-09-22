@@ -123,7 +123,15 @@ class ReplayBuffer:
 
         """
         # ==================== YOUR CODE HERE (Part 1a) ====================
-        raise NotImplementedError("Implement ReplayBuffer.add")
+        # Write into the next free slot; when the buffer is full, ``pos`` has
+        # already wrapped around and this overwrites the oldest transition.
+        self.observations[self.pos] = obs
+        self.next_observations[self.pos] = next_obs
+        self.actions[self.pos] = action
+        self.rewards[self.pos] = reward
+        self.dones[self.pos] = done
+        self.pos = (self.pos + 1) % self.capacity
+        self.size = min(self.size + 1, self.capacity)
         # ==================================================================
 
     def sample(self, batch_size: int) -> Batch:
@@ -135,7 +143,16 @@ class ReplayBuffer:
 
         """
         # ==================== YOUR CODE HERE (Part 1b) ====================
-        raise NotImplementedError("Implement ReplayBuffer.sample")
+        # Draw from [0, size), never [0, capacity): the slots beyond ``size``
+        # are still zeros and are not transitions the agent ever experienced.
+        idx = np.random.randint(0, self.size, size=batch_size)
+        return Batch(
+            observations=torch.as_tensor(self.observations[idx], device=self.device),
+            actions=torch.as_tensor(self.actions[idx], device=self.device),
+            next_observations=torch.as_tensor(self.next_observations[idx], device=self.device),
+            rewards=torch.as_tensor(self.rewards[idx], device=self.device),
+            dones=torch.as_tensor(self.dones[idx], device=self.device),
+        )
         # ==================================================================
 
 
@@ -144,7 +161,13 @@ def compute_td_targets(target_network, batch: Batch, gamma: float) -> torch.Tens
 
     """
     # ===================== YOUR CODE HERE (Part 2) =====================
-    raise NotImplementedError("Implement compute_td_targets")
+    # The target needs three things: the immediate reward, the value of the
+    # best action in the next state (greedy max over actions, from the *target*
+    # network so the target does not move with every gradient step), and a mask
+    # that stops bootstrapping at true terminations.
+    target_max, _ = target_network(batch.next_observations).max(dim=1)
+    # flatten() keeps everything (B,); (B, 1) operands would broadcast to (B, B).
+    return batch.rewards.flatten() + gamma * target_max * (1.0 - batch.dones.flatten())
     # ===================================================================
 
 
