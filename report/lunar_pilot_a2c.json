@@ -1,0 +1,102 @@
+{
+  "ll_cartpole_hp": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 103.68557060430346,
+    "final_train_return": 84.1,
+    "max_train_return": 200.1,
+    "final_entropy": 0.528,
+    "median_explained_variance": 0.971,
+    "median_value_loss": 2.1
+  },
+  "ll_clip0.5": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 145.67826005504008,
+    "final_train_return": 180.3,
+    "max_train_return": 191.5,
+    "final_entropy": 0.804,
+    "median_explained_variance": 0.314,
+    "median_value_loss": 161.7
+  },
+  "ll_envs32": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 126.38224825863804,
+    "final_train_return": 128.9,
+    "max_train_return": 131.2,
+    "final_entropy": 0.893,
+    "median_explained_variance": 0.24,
+    "median_value_loss": 162.8
+  },
+  "ll_h64": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 90.64002864625316,
+    "final_train_return": 84.1,
+    "max_train_return": 120.6,
+    "final_entropy": 0.978,
+    "median_explained_variance": 0.203,
+    "median_value_loss": 179.6
+  },
+  "ll_lr3e-4": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 233.73731772370985,
+    "final_train_return": 162.2,
+    "max_train_return": 184.7,
+    "final_entropy": 0.806,
+    "median_explained_variance": 0.088,
+    "median_value_loss": 249.1
+  },
+  "ll_steps256": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 208.75642247764964,
+    "final_train_return": 228.5,
+    "max_train_return": 239.0,
+    "final_entropy": 0.745,
+    "median_explained_variance": 0.014,
+    "median_value_loss": 476.4
+  },
+  "ll_steps32": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": -114.8338412349267,
+    "final_train_return": -107.2,
+    "max_train_return": 74.5,
+    "final_entropy": 0.861,
+    "median_explained_variance": 0.387,
+    "median_value_loss": 78.9
+  },
+  "ll_steps5": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 113.80906521948677,
+    "final_train_return": 60.3,
+    "max_train_return": 177.5,
+    "final_entropy": 0.353,
+    "median_explained_variance": 0.967,
+    "median_value_loss": 1.8
+  },
+  "ll_tuned": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 185.35961868426494,
+    "final_train_return": 216.7,
+    "max_train_return": 230.1,
+    "final_entropy": 0.716,
+    "median_explained_variance": 0.05,
+    "median_value_loss": 468.8
+  },
+  "ll_vf0.5": {
+    "steps": 2000000,
+    "seed": 1,
+    "eval_mean": 200.92717664687734,
+    "final_train_return": 193.4,
+    "max_train_return": 214.9,
+    "final_entropy": 0.735,
+    "median_explained_variance": 0.082,
+    "median_value_loss": 454.3
+  }
+}

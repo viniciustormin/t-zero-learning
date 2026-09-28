@@ -1,0 +1,6 @@
+# Extra dependencies for the assignment tooling (sweeps, figures, PDF).
+# requirements.txt covers training itself; these cover reporting.
+#   uv pip install -r tools/requirements-report.txt
+matplotlib>=3.10   # tools/make_figures_a2c.py
+typst>=0.13        # tools/build_report_a2c.py (Python binding; no CLI entry point)
+pytest>=8          # tests/test_a2c.py

@@ -1,0 +1,38 @@
+# A2C on LunarLander-v3 (assignment extra). Starts from a2c_cartpole; the
+# values below are the ones the pilot sweep actually selected, not the ones we
+# assumed would be needed.
+#
+# What the pilot showed (2M steps, 1 seed each, tools/run_sweep_a2c.py --suite lunar):
+#   - num_steps is the decisive knob: 5 -> 32 -> 128 moves the final return
+#     from ~60 to ~-100 to ~220. The reward that decides the episode (+100
+#     landing / -100 crash) arrives only at the end, and a short n-step return
+#     hands that credit to a critic that cannot yet predict it.
+#   - vf_coef / max_grad_norm, which we expected to have to lower/raise because
+#     the returns are an order of magnitude bigger than CartPole's, barely
+#     matter once the horizon is right; see the `ll_vf0.5` / `ll_clip0.5` arms.
+#   - num_envs=16 and a 128-unit hidden layer help but are not what decides it.
+
+algorithm: a2c
+env_id: LunarLander-v3
+seed: 1
+cuda: false
+total_timesteps: 5000000
+num_envs: 16
+
+track: true
+capture_video: true
+save_model: true
+checkpoint_every: 0
+
+agent:
+  activation: Tanh
+  hidden_layers_size: 128
+
+a2c:
+  learning_rate: 7.0e-4
+  num_steps: 128
+  gamma: 0.99
+  vf_coef: 0.25
+  ent_coef: 0.01
+  max_grad_norm: 1.0
+  use_baseline: true
