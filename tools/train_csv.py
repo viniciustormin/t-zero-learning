@@ -16,6 +16,7 @@ Alongside the JSONL a ``meta.json`` is written with the tag, the wandb run url
 instead of by the harness's timestamped run name.
 """
 import json
+import numbers
 import os
 import sys
 from pathlib import Path
@@ -27,6 +28,25 @@ import wandb  # noqa: E402
 from wandb.sdk.wandb_run import Run  # noqa: E402
 
 import train  # noqa: E402
+
+
+def _as_number(value):
+    """Python number for anything scalar-numeric, else ``None``.
+
+    ``isinstance(v, float)`` is not enough: ``np.float32`` (what
+    ``losses/explained_variance`` is, since it comes from ``np.var`` over a
+    float32 tensor) is *not* a subclass of ``float``, so a plain isinstance
+    filter silently drops the metric from the mirror.  ``np.float64`` is, which
+    is why this only bites some metrics.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, numbers.Number):
+        try:
+            return int(value) if isinstance(value, numbers.Integral) else float(value)
+        except (TypeError, ValueError):
+            return None
+    return None
 
 
 def _install_mirror() -> None:
@@ -62,7 +82,7 @@ def _install_mirror() -> None:
 
     def mirrored_log(self, data, step=None, **kwargs):
         if isinstance(data, dict):
-            row = {k: v for k, v in data.items() if isinstance(v, (int, float, bool))}
+            row = {k: n for k, v in data.items() if (n := _as_number(v)) is not None}
             if step is not None:
                 row.setdefault("global_step", step)
             sink.write(json.dumps(row) + "\n")

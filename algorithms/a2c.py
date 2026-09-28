@@ -114,7 +114,16 @@ def compute_n_step_returns(
         R_T = next_value.
     """
     # ===================== YOUR CODE HERE (Part 1) =====================
-    raise NotImplementedError("Implement compute_n_step_returns")
+    # One backward pass over the rollout. ``running`` holds R_{t+1} for every
+    # environment at once (shape (N,)), so the columns never mix: the recursion
+    # is applied elementwise and a ``done`` in one column zeroes the bootstrap
+    # only for that column.
+    returns = torch.zeros_like(rewards)
+    running = next_value  # R_T = V(s_T)
+    for t in reversed(range(rewards.shape[0])):
+        running = rewards[t] + gamma * (1.0 - dones[t]) * running
+        returns[t] = running
+    return returns
     # ===================================================================
 
 
@@ -132,7 +141,14 @@ def compute_policy_loss(
     *ascent*.
     """
     # ===================== YOUR CODE HERE (Part 2) =====================
-    raise NotImplementedError("Implement compute_policy_loss")
+    # The weight is a *constant* for the policy gradient: nabla J = E[nabla
+    # log pi * A], with A treated as a fixed scalar. ``values`` carries the
+    # critic's graph (it is also used by the value loss in the same backward
+    # pass), so it must be detached here -- otherwise the policy loss would
+    # also push V(s) *down* wherever log pi is negative, which is not the
+    # policy gradient and not the critic's regression objective either.
+    weights = (returns - values) if use_baseline else returns
+    return -(logprobs * weights.detach()).mean()
     # ===================================================================
 
 

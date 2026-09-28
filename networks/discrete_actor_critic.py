@@ -61,7 +61,15 @@ class DiscreteActorCritic(nn.Module):
         ``sample()``, ``log_prob(action)`` and ``entropy()``.
         """
         # ===================== YOUR CODE HERE (Part 3) =====================
-        raise NotImplementedError("Implement DiscreteActorCritic.get_action_and_value")
+        logits = self.actor(x)
+        probs = Categorical(logits=logits)
+        if action is None:
+            # argmax of the logits == argmax of the softmax probabilities
+            action = logits.argmax(dim=-1) if deterministic else probs.sample()
+        # When an action is given we only *evaluate* it: the update recomputes
+        # log pi(a|s) for the actions the rollout actually took, under the
+        # current parameters.
+        return action, probs.log_prob(action), probs.entropy(), self.critic(x)
         # ===================================================================
 
     def act(self, x, deterministic: bool = False):
