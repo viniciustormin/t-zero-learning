@@ -219,3 +219,6 @@ algorithms/dqn_solution.py
 # assignment sweep outputs
 sweep_results/
 sweep_results_a2c/
+sweep_results_ppo/
+
+docs/plans

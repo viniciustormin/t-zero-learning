@@ -24,7 +24,8 @@ capture_video: true
 save_model: true
 checkpoint_every: 0
 
-agent:
+network: DiscreteActorCritic
+network_kwargs:
   activation: Tanh
   hidden_layers_size: 128
 

@@ -57,7 +57,7 @@ LUNAR_CONFIGS: dict[str, list[str]] = {
     # hyperparameters dropped onto LunarLander.
     "ll_cartpole_hp": [
         "num_envs=8", "a2c.num_steps=5", "a2c.vf_coef=0.5",
-        "a2c.max_grad_norm=0.5", "agent.hidden_layers_size=64",
+        "a2c.max_grad_norm=0.5", "network_kwargs.hidden_layers_size=64",
     ],
     # n-step horizon — the knob the pilot found decisive.
     "ll_steps5": ["a2c.num_steps=5"],
@@ -69,7 +69,7 @@ LUNAR_CONFIGS: dict[str, list[str]] = {
     # capacity / throughput
     "ll_lr3e-4": ["a2c.learning_rate=3.0e-4"],
     "ll_envs32": ["num_envs=32"],
-    "ll_h64": ["agent.hidden_layers_size=64"],
+    "ll_h64": ["network_kwargs.hidden_layers_size=64"],
 }
 
 SUITES = {
