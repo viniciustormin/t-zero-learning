@@ -1,0 +1,38 @@
+# Round-4 arm of the Part 4 tuning (a run that did NOT become the final config):
+# lr 1e-3 + 10 epochs at 2M with num_envs=4, plus target_kl=0.02 to stop the
+# epochs of an update when approx_kl spikes. In a YAML because
+# `--override ppo.target_kl=0.02` sets a *string* (the override parser takes
+# the type from the current value, and target_kl defaults to None).
+
+algorithm: ppo
+env_id: LunarLander-v3
+seed: 1
+cuda: false             # CPU is plenty for this env
+total_timesteps: 2000000 # the whole Part 4 budget (was 1000000)
+num_envs: 4             # parallel environments -> batch = num_envs * num_steps
+
+track: true             # log metrics to Weights & Biases (set WANDB_PROJECT in .env)
+capture_video: true     # record a video during the final evaluation
+save_model: true        # write model.pt + run a final evaluation
+checkpoint_every: 0
+
+network: DiscreteActorCritic   # your network from the A2C assignment
+network_kwargs:                # passed to its constructor — see its signature
+  activation: Tanh
+  hidden_layers_size: 64
+
+ppo:
+  learning_rate: 1.0e-3   # was 2.5e-4 (round 1)
+  anneal_lr: true
+  num_steps: 128        # rollout length per env
+  gamma: 0.99
+  gae_lambda: 0.95
+  num_minibatches: 4    # minibatch = batch / num_minibatches
+  update_epochs: 10     # was 4 (round 2)
+  norm_adv: true
+  clip_coef: 0.2
+  clip_vloss: true
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: 0.02        # was null

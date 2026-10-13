@@ -1,0 +1,44 @@
+# PPO on LunarLander-v3 — the Part 4 final config (solves it: seeds 1 and 2).
+#
+# Four changes from configs/ppo_lunarlander.yml, each forced by a chart
+# (report/tuning_log_ppo.md, report/relatorio_ppo.pdf):
+#   learning_rate  2.5e-4 -> 1e-3   approx_kl ~1e-4 and clipfrac 0 in the base:
+#                                   the policy barely moved per rollout
+#   update_epochs  4 -> 10          same symptom; with lr 1e-3, reaches 200 at ~0.3M
+#   total_timesteps 1M -> 2M        ...but drops back (approx_kl spikes) before 1M
+#   num_envs       4 -> 16          batch 2048: the drops go away
+#
+#   python train.py --config ppo_lunarlander_tuned --override seed=2
+
+algorithm: ppo
+env_id: LunarLander-v3
+seed: 1
+cuda: false             # CPU is plenty for this env
+total_timesteps: 2000000 # the whole Part 4 budget (was 1000000)
+num_envs: 16            # was 4: batch 512 -> 2048 (round 3)
+
+track: true             # log metrics to Weights & Biases (set WANDB_PROJECT in .env)
+capture_video: true     # record a video during the final evaluation
+save_model: true        # write model.pt + run a final evaluation
+checkpoint_every: 0
+
+network: DiscreteActorCritic   # your network from the A2C assignment
+network_kwargs:                # passed to its constructor — see its signature
+  activation: Tanh
+  hidden_layers_size: 64
+
+ppo:
+  learning_rate: 1.0e-3   # was 2.5e-4 (round 1)
+  anneal_lr: true
+  num_steps: 128        # rollout length per env
+  gamma: 0.99
+  gae_lambda: 0.95
+  num_minibatches: 4    # minibatch = batch / num_minibatches
+  update_epochs: 10     # was 4 (round 2)
+  norm_adv: true
+  clip_coef: 0.2
+  clip_vloss: true
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  target_kl: null

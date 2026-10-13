@@ -19,6 +19,7 @@ import json
 import numbers
 import os
 import sys
+import time
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -57,6 +58,7 @@ def _install_mirror() -> None:
 
     sink = out_path.open("w", buffering=1)
     state = {"url": None, "rows": 0}
+    t0 = time.time()
     # Patch the *method*, not ``wandb.log``: ``wandb.init`` rebinds the module
     # attribute to the freshly created run's bound method, which would silently
     # undo a module-level patch.
@@ -85,6 +87,8 @@ def _install_mirror() -> None:
             row = {k: n for k, v in data.items() if (n := _as_number(v)) is not None}
             if step is not None:
                 row.setdefault("global_step", step)
+            # wall-clock seconds since launch: wandb's "Relative Time" axis
+            row["_wall"] = time.time() - t0
             sink.write(json.dumps(row) + "\n")
             state["rows"] += 1
             if state["url"] is None:
