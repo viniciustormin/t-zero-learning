@@ -15,7 +15,7 @@
     *Vinícius Nogueira Tormin* e *Bruno Calura* · Aprendizado por Reforço, UFG · orçamento de 100 mil passos de ambiente \
     Fork com `algorithms/sac.py` e os configs usados (`configs/sac_hopper.yml`, `configs/sac_hopper_tuned.yml`; os overrides de cada braço estão em `tools/run_sweep_sac.py`):
     #link("https://github.com/viniciustormin/t-zero-learning")[github.com/viniciustormin/t-zero-learning] ·
-    W&B: projeto `sac-assignment` (`exp_name` = braço; seed no config)
+    W&B: sem conta; runs gravados offline no projeto `sac-assignment` (`wandb/offline-run-*`, `exp_name` = braço)
   ]
 ]
 
@@ -24,8 +24,7 @@
     #lead[Protocolo.] `tests/test_sac.py` 16/16 antes de qualquer treino. Sanidade no Pendulum (`sac_pendulum`, 20k):
     `eval/mean_return` = *−129,9* (> −200). Corrigimos uma linha *fora* do algoritmo: o `train.py` imprimia
     `args.algo.learning_rate`, que o `SACConfig` não tem (`policy_lr`/`q_lr`), e todo treino SAC quebrava. Cada *braço* = um
-    config + overrides (`tools/run_sweep_sac.py`); 3 seeds por config na Parte 3, 2 nas Partes 4–5. Os runs foram gravados com
-    `WANDB_MODE=offline` e publicados com `wandb sync`; as figuras vêm do espelho local de cada `wandb.log`
+    config + overrides (`tools/run_sweep_sac.py`); 3 seeds por config na Parte 3, 2 nas Partes 4–5. Sem conta no W&B: `WANDB_MODE=offline`, e as figuras vêm do espelho local de cada `wandb.log`
     (`tools/train_csv.py` → `sweep_results_sac/<braço>__seed<N>/metrics.jsonl`), e *todo número* sai de
     `tools/summarize_sac.py` (trajetórias: `--trace`). Diário completo: `report/tuning_log_sac.md`; previsões, escritas antes de cada experimento:
     `report/predictions_sac.md`. Até 8 runs em paralelo (núcleos P, 1 thread cada); *tempo e SPS só vêm dos runs isolados*
